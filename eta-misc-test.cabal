@@ -20,6 +20,11 @@ executable eta-misc-test
   -- other-modules:       
   -- other-extensions:    
   build-depends:       base >=4.8 && <4.9
-                     , bytestring
+                     , wai-servlet
+                     , wai-servlet-handler-jetty
+                     , servant >= 0.9.1.1 && <= 0.11
+                     , servant-server >= 0.9.1.1 && <= 0.11
+                     , wai
+                     , aeson >= 1.1.0.0 && <= 1.2.3.0
   hs-source-dirs:      src
   default-language:    Haskell2010

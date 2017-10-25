@@ -1,18 +1,38 @@
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE TypeOperators #-}
+
+
 module Main where
 
-import qualified Data.ByteString.Lazy as LBS
-import qualified Data.ByteString.Lazy.Char8 as LBS8
+import           Data.Aeson
+import           GHC.Generics
+import           Network.Wai
+import           Network.Wai.Servlet.Handler.Jetty
+import           Servant
+import           System.IO
+
+data Foobar = Foo | Bar
+  deriving (Eq, Show, Generic)
+
+instance ToJSON Foobar
+
+type Api =
+  "foobar" :> Capture "fooId" Integer :> Get '[JSON] Foobar
+
+api :: Proxy Api
+api = Proxy
+
+server :: Server Api
+server =
+  getFoobar
+
+getFoobar :: Integer -> Handler Foobar
+getFoobar = \ case
+  0 -> return Foo
+  _ -> return Bar
 
 main :: IO ()
 main = 
-    do
-        myLBS <- LBS.readFile "src/Main.hs"
-        putStrLn $ "Read File"
-
-        {- these lines will exception -}
-        let lbsLength = LBS.length myLBS
-        putStrLn $ "Length " ++ (show lbsLength)
-
-        {- If instead of the above lines I try the following then
-           the program prints this text as expected but exceptions follow -}
-        -- LBS8.putStrLn myLBS
+    run 9000 $ serve api $ server
